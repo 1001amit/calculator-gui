@@ -45,41 +45,50 @@ class Calculator:
             buttons_frame.grid_rowconfigure(i, weight=1)
 
     def on_button_click(self, button):
-        if button == "=":
-            try:
+        try:
+            if button == "=":
                 self.expression = self.expression.replace("π", str(math.pi))  # Replace "π" with math.pi
-                result = str(eval(self.expression))
+                # Evaluate the expression and round the result to prevent floating-point issues
+                result = str(round(eval(self.expression), 10))
                 self.expression = result
                 self.input_text.set(result)
-            except:
-                self.input_text.set("Error")
-        elif button == "C":
-            self.expression = ""
-            self.input_text.set("")
-        elif button == "←":
-            self.expression = self.expression[:-1]
-            self.input_text.set(self.expression)
-        elif button in ["sin", "cos", "tan", "log", "exp"]:
-            self.expression += f"math.{button}("
-        elif button == "π":
-            self.expression += "π"
-        elif button == "MC":
-            self.memory = 0
-        elif button == "MR":
-            self.expression += str(self.memory)
-        elif button == "M+":
-            try:
+            elif button == "C":
+                self.expression = ""
+                self.input_text.set("")
+            elif button == "←":
+                self.expression = self.expression[:-1]
+                self.input_text.set(self.expression)
+            elif button == "sin":
+                self.expression = str(math.sin(math.radians(eval(self.expression))))
+                self.input_text.set(self.expression)
+            elif button == "cos":
+                self.expression = str(math.cos(math.radians(eval(self.expression))))
+                self.input_text.set(self.expression)
+            elif button == "tan":
+                self.expression = str(math.tan(math.radians(eval(self.expression))))
+                self.input_text.set(self.expression)
+            elif button == "log":
+                self.expression = str(math.log10(eval(self.expression)))
+                self.input_text.set(self.expression)
+            elif button == "exp":
+                self.expression = str(math.exp(eval(self.expression)))
+                self.input_text.set(self.expression)
+            elif button == "π":
+                self.expression += "π"
+            elif button == "MC":
+                self.memory = 0
+            elif button == "MR":
+                self.expression += str(self.memory)
+            elif button == "M+":
                 self.memory += eval(self.expression)
-            except:
-                self.input_text.set("Error")
-        elif button == "M-":
-            try:
+            elif button == "M-":
                 self.memory -= eval(self.expression)
-            except:
-                self.input_text.set("Error")
-        else:
-            self.expression += button
-            self.input_text.set(self.expression)
+            else:
+                self.expression += button
+                self.input_text.set(self.expression)
+        except Exception as e:
+            self.input_text.set("Error")
+            self.expression = ""
 
 if __name__ == "__main__":
     root = tk.Tk()
