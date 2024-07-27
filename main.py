@@ -31,9 +31,8 @@ class Calculator:
             ('1', 3, 0), ('2', 3, 1), ('3', 3, 2), ('-', 3, 3),
             ('0', 4, 0), ('.', 4, 1), ('=', 4, 2), ('+', 4, 3),
             ('C', 5, 0), ('(', 5, 1), (')', 5, 2), ('←', 5, 3),
-            ('sin', 6, 0), ('cos', 6, 1), ('tan', 6, 2), ('log', 6, 3),
-            ('exp', 7, 0), ('π', 7, 1), ('MC', 7, 2), ('MR', 7, 3),
-            ('M+', 8, 0), ('M-', 8, 1)
+            ('log', 6, 0), ('exp', 6, 1), ('π', 6, 2), ('MC', 6, 3),
+            ('MR', 7, 0), ('M+', 7, 1), ('M-', 7, 2)
         ]
 
         for (text, row, col) in buttons:
@@ -41,45 +40,48 @@ class Calculator:
 
         for i in range(4):
             buttons_frame.grid_columnconfigure(i, weight=1)
-        for i in range(9):
+        for i in range(8):
             buttons_frame.grid_rowconfigure(i, weight=1)
 
     def on_button_click(self, button):
-        if button == "=":
-            try:
+        try:
+            if button == "=":
                 self.expression = self.expression.replace("π", str(math.pi))  # Replace "π" with math.pi
-                result = str(eval(self.expression))
+                self.expression = self.expression.replace("log(", "math.log10(")
+                self.expression = self.expression.replace("exp(", "math.exp(")
+
+                result = str(eval(self.expression))  # Evaluate the expression
                 self.expression = result
                 self.input_text.set(result)
-            except:
-                self.input_text.set("Error")
-        elif button == "C":
+            elif button == "C":
+                self.expression = ""
+                self.input_text.set("")
+            elif button == "←":
+                self.expression = self.expression[:-1]
+                self.input_text.set(self.expression)
+            elif button in ["log", "exp"]:
+                self.expression += button + "("
+                self.input_text.set(self.expression)
+            elif button == "π":
+                self.expression += str(math.pi)  # Use math.pi for better precision
+                self.input_text.set(self.expression)
+            elif button == "MC":
+                self.memory = 0
+            elif button == "MR":
+                self.expression += str(self.memory)
+                self.input_text.set(self.expression)
+            elif button == "M+":
+                if self.expression:  # Ensure there's an input before evaluation
+                    self.memory += float(eval(self.expression))  # Convert to float before adding
+            elif button == "M-":
+                if self.expression:  # Ensure there's an input before evaluation
+                    self.memory -= float(eval(self.expression))  # Convert to float before subtracting
+            else:
+                self.expression += button
+                self.input_text.set(self.expression)
+        except Exception as e:
+            self.input_text.set("Error")
             self.expression = ""
-            self.input_text.set("")
-        elif button == "←":
-            self.expression = self.expression[:-1]
-            self.input_text.set(self.expression)
-        elif button in ["sin", "cos", "tan", "log", "exp"]:
-            self.expression += f"math.{button}("
-        elif button == "π":
-            self.expression += "π"
-        elif button == "MC":
-            self.memory = 0
-        elif button == "MR":
-            self.expression += str(self.memory)
-        elif button == "M+":
-            try:
-                self.memory += eval(self.expression)
-            except:
-                self.input_text.set("Error")
-        elif button == "M-":
-            try:
-                self.memory -= eval(self.expression)
-            except:
-                self.input_text.set("Error")
-        else:
-            self.expression += button
-            self.input_text.set(self.expression)
 
 if __name__ == "__main__":
     root = tk.Tk()
